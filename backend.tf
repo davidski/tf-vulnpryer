@@ -5,6 +5,6 @@ terraform {
     bucket     = "infrastructure-severski"
     key        = "terraform/vulnpryer.tfstate"
     region     = "us-west-2"
-    lock_table = "terraform_locks"
+    dynamo_table = "terraform_locks"
   }
 }
