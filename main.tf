@@ -1,16 +1,17 @@
 provider "aws" {
-  region  = "${var.aws_region}"
-  profile = "${var.aws_profile}"
-  version = "~> 1.54"
+  region  = var.aws_region
+  profile = var.aws_profile
+  version = "~> 2.7"
 
   assume_role {
     role_arn = "arn:aws:iam::754135023419:role/administrator-service"
   }
 }
 
-provider "aws.east_1" {
+provider "aws" {
+  alias = "us-east-1" 
   region  = "us-east-1"
-  profile = "${var.aws_profile}"
+  profile = var.aws_profile
 
   assume_role {
     role_arn = "arn:aws:iam::754135023419:role/administrator-service"
@@ -25,14 +26,14 @@ data "aws_caller_identity" "current" {}
 
 # Data source for ACM certificate
 data "aws_acm_certificate" "vulnpryer" {
-  provider = "aws.east_1"
+  provider = "aws.us-east-1"
   domain   = "vulnpryer.net"
 }
 
 data "terraform_remote_state" "main" {
   backend = "s3"
 
-  config {
+  config = {
     bucket  = "infrastructure-severski"
     key     = "terraform/infrastructure.tfstate"
     region  = "us-west-2"
@@ -67,7 +68,7 @@ resource "aws_cloudfront_distribution" "vp" {
 
   logging_config {
     include_cookies = false
-    bucket          = "${data.terraform_remote_state.main.auditlogs}.s3.amazonaws.com"
+    bucket          = "${data.terraform_remote_state.main.outputs.auditlogs}.s3.amazonaws.com"
     prefix          = "cloudfront/vulnpryer"
   }
 
@@ -100,14 +101,14 @@ resource "aws_cloudfront_distribution" "vp" {
     }
   }
 
-  tags {
+  tags = {
     Name       = "VP CloudFront"
-    project    = "${var.project}"
+    project    = var.project
     managed_by = "Terraform"
   }
 
   viewer_certificate {
-    acm_certificate_arn      = "${data.aws_acm_certificate.vulnpryer.arn}"
+    acm_certificate_arn      = data.aws_acm_certificate.vulnpryer.arn
     minimum_protocol_version = "TLSv1"
     ssl_support_method       = "sni-only"
   }

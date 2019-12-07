@@ -7,14 +7,14 @@
 resource "aws_route53_zone" "vulnpryer" {
   name = "vulnpryer.net."
 
-  tags {
+  tags = {
     managed_by = "Terraform"
-    project    = "${var.project}"
+    project    = var.project
   }
 }
 
 resource "aws_route53_record" "vulnpryer" {
-  zone_id = "${aws_route53_zone.vulnpryer.zone_id}"
+  zone_id = aws_route53_zone.vulnpryer.zone_id
   name    = "google-site-verification"
   type    = "TXT"
   ttl     = 120
@@ -22,7 +22,7 @@ resource "aws_route53_record" "vulnpryer" {
 }
 
 resource "aws_route53_record" "vulnpryerDKIM" {
-  zone_id = "${aws_route53_zone.vulnpryer.zone_id}"
+  zone_id = aws_route53_zone.vulnpryer.zone_id
   name    = "google._domainkey"
   type    = "TXT"
   ttl     = 120
@@ -31,8 +31,8 @@ resource "aws_route53_record" "vulnpryerDKIM" {
 }
 
 resource "aws_route53_record" "vulnpryerMX" {
-  zone_id = "${aws_route53_zone.vulnpryer.zone_id}"
-  name    = "${aws_route53_zone.vulnpryer.name}"
+  zone_id = aws_route53_zone.vulnpryer.zone_id
+  name    = aws_route53_zone.vulnpryer.name
   type    = "MX"
   ttl     = "300"
 
@@ -52,25 +52,25 @@ resource "aws_route53_record" "vulnpryerMX" {
 */
 
 resource "aws_route53_record" "vulnpryer_gh" {
-  zone_id = "${aws_route53_zone.vulnpryer.zone_id}"
-  name    = "${aws_route53_zone.vulnpryer.name}"
+  zone_id = aws_route53_zone.vulnpryer.zone_id
+  name    = aws_route53_zone.vulnpryer.name
   type    = "A"
 
   alias {
-    name                   = "${aws_cloudfront_distribution.vp.domain_name}"
-    zone_id                = "${aws_cloudfront_distribution.vp.hosted_zone_id}"
+    name                   = aws_cloudfront_distribution.vp.domain_name
+    zone_id                = aws_cloudfront_distribution.vp.hosted_zone_id
     evaluate_target_health = false
   }
 }
 
 resource "aws_route53_record" "vulnpryer_gh_www" {
-  zone_id = "${aws_route53_zone.vulnpryer.zone_id}"
+  zone_id = aws_route53_zone.vulnpryer.zone_id
   name    = "www.${aws_route53_zone.vulnpryer.name}"
   type    = "A"
 
   alias {
-    name                   = "${aws_cloudfront_distribution.vp.domain_name}"
-    zone_id                = "${aws_cloudfront_distribution.vp.hosted_zone_id}"
+    name                   = aws_cloudfront_distribution.vp.domain_name
+    zone_id                = aws_cloudfront_distribution.vp.hosted_zone_id
     evaluate_target_health = false
   }
 }
@@ -82,25 +82,25 @@ resource "aws_route53_record" "vulnpryer_gh_www" {
 */
 
 resource "aws_route53_record" "vulnpryer_gh_v6" {
-  zone_id = "${aws_route53_zone.vulnpryer.zone_id}"
-  name    = "${aws_route53_zone.vulnpryer.name}"
+  zone_id = aws_route53_zone.vulnpryer.zone_id
+  name    = aws_route53_zone.vulnpryer.name
   type    = "AAAA"
 
   alias {
-    name                   = "${aws_cloudfront_distribution.vp.domain_name}"
-    zone_id                = "${aws_cloudfront_distribution.vp.hosted_zone_id}"
+    name                   = aws_cloudfront_distribution.vp.domain_name
+    zone_id                = aws_cloudfront_distribution.vp.hosted_zone_id
     evaluate_target_health = false
   }
 }
 
 resource "aws_route53_record" "vulnpryer_gh_www_v6" {
-  zone_id = "${aws_route53_zone.vulnpryer.zone_id}"
+  zone_id = aws_route53_zone.vulnpryer.zone_id
   name    = "www.${aws_route53_zone.vulnpryer.name}"
   type    = "AAAA"
 
   alias {
-    name                   = "${aws_cloudfront_distribution.vp.domain_name}"
-    zone_id                = "${aws_cloudfront_distribution.vp.hosted_zone_id}"
+    name                   = aws_cloudfront_distribution.vp.domain_name
+    zone_id                = aws_cloudfront_distribution.vp.hosted_zone_id
     evaluate_target_health = false
   }
 }
@@ -112,9 +112,9 @@ resource "aws_route53_record" "vulnpryer_gh_www_v6" {
 */
 
 output "vulnpryer_nameservers" {
-  value = "${aws_route53_zone.vulnpryer.name_servers}"
+  value = aws_route53_zone.vulnpryer.name_servers
 }
 
 output "vulnpryer_zoneid" {
-  value = "${aws_route53_zone.vulnpryer.zone_id}"
+  value = aws_route53_zone.vulnpryer.zone_id
 }
