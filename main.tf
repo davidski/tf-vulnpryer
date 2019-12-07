@@ -26,8 +26,40 @@ data "aws_caller_identity" "current" {}
 
 # Data source for ACM certificate
 data "aws_acm_certificate" "vulnpryer" {
-  provider = "aws.us-east-1"
+  provider = aws.us-east-1
   domain   = "vulnpryer.net"
+}
+
+/*
+  ------------------
+  | Certificate(s) |
+  ------------------
+*/
+
+resource "aws_acm_certificate" "vulnpryer" { 
+  provider = aws.us-east-1
+
+  domain_name = "vulnpryer.net"
+  subject_alternative_names = ["*.vulnpryer.net"]
+  validation_method = "DNS"
+
+  tags = {
+    managed_by = "Terraform"
+    project = var.project
+    Name = "vulnpryer.net"
+  }
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+resource "aws_route53_record" "vulnpryer_cert_validation" {
+  zone_id = aws_route53_zone.vulnpryer.zone_id
+  name    = aws_acm_certificate.vulnpryer.domain_validation_options.0.resource_record_name
+  type    = aws_acm_certificate.vulnpryer.domain_validation_options.0.resource_record_type
+  records = [aws_acm_certificate.vulnpryer.domain_validation_options.0.resource_record_value]
+  ttl     = "600"
 }
 
 data "terraform_remote_state" "main" {
@@ -42,9 +74,9 @@ data "terraform_remote_state" "main" {
 }
 
 /*
-  --------------------------
-  | CloudFront Distributon |
-  --------------------------
+  ---------------------------
+  | CloudFront Distribution |
+  ---------------------------
 */
 
 resource "aws_cloudfront_distribution" "vp" {
@@ -63,7 +95,7 @@ resource "aws_cloudfront_distribution" "vp" {
 
   enabled             = true
   is_ipv6_enabled     = true
-  comment             = "Some comment"
+  comment             = "VulnPryer Website"
   default_root_object = "index.html"
 
   logging_config {
@@ -93,7 +125,7 @@ resource "aws_cloudfront_distribution" "vp" {
     max_ttl                = 86400
   }
 
-  price_class = "PriceClass_200"
+  price_class = "PriceClass_100"
 
   restrictions {
     geo_restriction {
@@ -108,8 +140,8 @@ resource "aws_cloudfront_distribution" "vp" {
   }
 
   viewer_certificate {
-    acm_certificate_arn      = data.aws_acm_certificate.vulnpryer.arn
-    minimum_protocol_version = "TLSv1"
+    acm_certificate_arn      = aws_acm_certificate.vulnpryer.arn
+    minimum_protocol_version = "TLSv1.2_2018"
     ssl_support_method       = "sni-only"
   }
 }
