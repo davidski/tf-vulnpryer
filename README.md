@@ -1,8 +1,6 @@
-# Library Deployment
+# Vulnpryer infrastructure
 
-TODOs
-1. ALB logging to cyentia-logs (needs changes to go to log bucket_)
-2. Send ECS logs to CloudWatch Logs in the logging account instead of going to the same account as the library environment.
+> *DEPRECATED* This component has been merged into my primary mono-repo.
 
 <!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
 ## Requirements
